@@ -1,6 +1,8 @@
 <!-- To downloads all dependencies specified in go.mod. -->
 go mod tidy
 
-to run the backend code 
+<!-- To run the backend code  -->
 
-cd backend then go run main.go
+1. cd backend
+
+2.  go run main.go
