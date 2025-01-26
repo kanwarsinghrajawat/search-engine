@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"backend/handlers"
 )
 
 // RegisterRoutes sets up API endpoints
