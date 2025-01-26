@@ -1,9 +1,10 @@
+import SearchCharacter from "./components/SearchCharcter";
 import "./index.css";
 
 const App = () => {
   return (
     <div>
-      <p>Running...</p>{" "}
+      <SearchCharacter />
     </div>
   );
 };
