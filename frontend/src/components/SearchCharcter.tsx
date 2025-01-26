@@ -1,24 +1,57 @@
 import React, { useState, useEffect } from "react";
+import { Character } from "../types/Character";
 import { fetchCharacterByName } from "../api";
-import SearchBar from "./SearchBar";
+import SearchBar from "./Searchbar";
+import SkeletonLoader from "./SkeletonLoader";
+import ErrorMessage from "./ErrorMessage";
+import CharacterList from "./CharacterList";
 
 const SearchCharacter: React.FC = () => {
   const [name, setName] = useState<string>("");
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [debouncedName, setDebouncedName] = useState<string>(name);
 
   useEffect(() => {
-    if (!name.trim()) return;
+    const handler = setTimeout(() => {
+      setDebouncedName(name);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [name]);
+
+  useEffect(() => {
+    if (debouncedName.trim() === "") {
+      setCharacters([]);
+      setError("Please enter a character name.");
+      return;
+    }
 
     const fetchCharacters = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const results = await fetchCharacterByName(name);
-        console.log("Fetched Characters:", results);
+        const results = await fetchCharacterByName(debouncedName);
+        const charactersArray = results?.characters || [];
+
+        if (charactersArray.length > 0) {
+          setCharacters(charactersArray);
+        } else {
+          setCharacters([]);
+          setError("No characters found.");
+        }
       } catch (err) {
         console.error("Error fetching character:", err);
+        setError("Failed to fetch character.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchCharacters();
-  }, [name]);
+  }, [debouncedName]);
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-white flex flex-col items-center p-6">
@@ -27,6 +60,12 @@ const SearchCharacter: React.FC = () => {
       </h1>
 
       <SearchBar name={name} setName={setName} />
+
+      {loading && <SkeletonLoader />}
+
+      {error && !loading && <ErrorMessage message={error} />}
+
+      {!error && !loading && <CharacterList characters={characters} />}
     </div>
   );
 };
